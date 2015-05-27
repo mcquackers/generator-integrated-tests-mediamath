@@ -20,7 +20,7 @@
     "ejs": "^2.3.1",
     "factory_girl": "^0.2.1",
     "mocha": "^2.2.5",
-    "selenium-webdriver": "^2.20.0",
+    "selenium-webdriver": "^2.45.1",
     "yeoman-generator": "^0.20.1"
   }
 }
