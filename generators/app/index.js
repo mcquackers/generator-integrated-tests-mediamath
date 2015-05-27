@@ -35,5 +35,12 @@ module.exports = generators.Base.extend({
       this.templatePath("./chromedriver"),
       this.destinationPath("./chromedriver")
     );
+    this.fs.copy(
+      this.templatePath("./package.json"),
+      this.destinationPath("./package.json")
+    );
+  },
+  install: function() {
+    this.npmInstall();
   }
 });
