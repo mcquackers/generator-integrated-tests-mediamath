@@ -23,7 +23,30 @@ module.exports = generators.Base.extend({
           message : "Enter Ticket Name: "
         }, function(answers) {
           this.ticketName = answers.ticketName;
-          done();
+          this.prompt({
+            type      : "input",
+            name      : "advertiser",
+            message   : "Advertiser to use for test: ",
+            store     : true
+          }, function(answers) {
+            this.advertiser = answers.advertiser;
+            this.prompt({
+              type    : "input",
+              name    : "segmentName",
+              message : "Name for segment: "
+            }, function(answers) {
+              this.segmentName = answers.segmentName;
+              this.prompt({
+                type  : "input",
+                name  : "mochaTimeout",
+                message : "Enter Mocha timeout: ",
+                store   : true
+              }, function(answers) {
+                this.mochaTimeout = answers.mochaTimeout;
+                done();
+              }.bind(this));
+            }.bind(this));
+          }.bind(this));
         }.bind(this));
       }.bind(this));
     }.bind(this));
@@ -35,8 +58,17 @@ module.exports = generators.Base.extend({
         {
           username: this.username,
           password: this.password,
-          ticketName: this.ticketName
+          ticketName: this.ticketName,
+          advertiser: this.advertiser,
+          segmentName: this.segmentName
         }
-      );
+        );
+    this.fs.copyTpl(
+        this.templatePath("./mocha.opts"),
+        this.destinationPath("./test/mocha.opts"),
+        {
+          mochaTimeout: this.mochaTimeout
+        }
+        );
   }
 });

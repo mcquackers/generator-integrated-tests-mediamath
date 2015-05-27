@@ -2,21 +2,21 @@
 var should = require("chai").should();
 var webdriver = require("selenium-webdriver");
 var test = require("selenium-webdriver/testing");
+var advertiserSearchKey = "<%= advertiser %>";
+var segmentName = "<%= segmentName %>";
 var WAIT_TIME = 25000;
 var browser;
 var loginBuddy;
 var behaviorBuddy;
 var segmentBuddy;
 // SET THESE VARIABLES BEFORE TESTING
-var advertiserSearchKey = "";
 var pixelsToSelect = [];
-var segmentName = "";
 
 test.describe("<%= ticketName %>", function() {
   test.before("Open browser and login", function(done) {
     browser = require("../test-buddies/browser-buddy.js").
       createBrowser(webdriver, WAIT_TIME);
-    loginBuddy = require("/../test-buddies/login-buddy.js");
+    loginBuddy = require("../test-buddies/login-buddy.js");
     behaviorBuddy = require("../test-buddies/behavior-buddy.js");
     segmentBuddy = require("../test-buddies/segment-buddy.js");
     behaviorBuddy.initialize(browser, webdriver);

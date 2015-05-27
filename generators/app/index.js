@@ -23,13 +23,17 @@ module.exports = generators.Base.extend({
     }.bind(this));
   },
   writing: function() {
-    console.log(this.templatePath());
     this.fs.copyTpl(
         this.templatePath("./test-buddies/"),
         this.destinationPath("./test-buddies/"),
         {
           username: this.username,
           password: this.password
-        });
+        }
+    );
+    this.fs.copy(
+      this.templatePath("./chromedriver"),
+      this.destinationPath("./chromedriver")
+    );
   }
 });
