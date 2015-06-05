@@ -1,3 +1,4 @@
+var Q = require("q");
 segmentBuddy = {};
 
 segmentBuddy.initialize = function(browser, webdriver) {
@@ -8,40 +9,82 @@ segmentBuddy.initialize = function(browser, webdriver) {
 segmentBuddy.setSegmentName = function(segmentName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var segmentNameInput = browser.findElement(
-      webdriver.By.xpath("//*[@id='segment-name-wc']")
-      );
-  segmentNameInput.click();
-  segmentNameInput.sendKeys(segmentName);
+  var promise = new Promise(function(resolve, reject) {
+    var segmentNameInput;
+    segmentNameInput = browser.findElement(webdriver.By.id("segment-name-wc"));
+    segmentNameInput.click().
+      then(function() {
+        return segmentNameInput.sendKeys(segmentName);
+      }).then(function() {
+        resolve(true);
+      });
+  });
+  return promise;
 };
 
 segmentBuddy.setAdvertiser = function(advertiserName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var dropDown = browser.
-    findElement(webdriver.By.xpath("//*[@id='advertisers']"));
-  setTimeout(function() {
-    dropDown.click().then(function() {
-      var searchBox = browser.findElement(webdriver.By.xpath("//*[@id='advertisers']/mm-input"));
-      searchBox.click();
-      searchBox.sendKeys(advertiserName);
+  var elementHold;
+  console.log("In setAdvertiser");
+  browser.findElement(webdriver.By.xpath("//*[@id='advertisers']")).
+    then(function(element) {
+      console.log("Found element");
+      var promise = new Promise(function(resolve, reject) {
+        setTimeout(function() {
+          console.log("About to click!");
+          element.click().then(function() {
+            resolve(true);
+          }, function(err) {
+            console.log("Oh no!");
+            reject(err);
+          });
+        }, 1500);
+      });
+      return promise;
+    }).then(function() {
+      return browser.findElement(webdriver.By.xpath("//*[@id='advertisers']/mm-input"));
+    }).
+  then(function(element) {
+    elementHold = element;
+    return element.click();
+  }).
+  then(function() {
+    var promise = new Promise(function(resolve, reject) {
       setTimeout(function() {
-        browser.findElements(
-            webdriver.By.xpath("//*[@id='advertisers']/mm-list-item")
-            ).then(function(elements) {
+        elementHold.sendKeys(advertiserName);
+        resolve(true);
+      }, 1000);
+    });
+    return promise;
+  }, function(err) {
+    console.log(err);
+  }).then(function() {
+    var promise = new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        browser.findElements(webdriver.By.xpath("//*[@id='advertisers']/mm-list-item")).then(function(elements) {
           var asyncCatcher = 0;
-          for(var i = 0;i < elements.length; i++) {
+          for(var i = 0; i < elements.length; i++) {
             elements[i].getText().then(function(text) {
-              if(text == advertiserName){
+              console.log(asyncCatcher);
+              console.log(text);
+              if(text == advertiserName) {
                 elements[asyncCatcher].click();
+                resolve(true);
+              } else if(asyncCatcher == elements.length) {
+                reject(new Error("The advertiser Search key could not be found in the list"));
+              } else {
+                asyncCatcher++;
               }
-              asyncCatcher++;
             });
           }
         });
-      }, 2000);
+      }, 1000);
     });
-  }, 3000);
+    return promise;
+  }).then(function(value) {
+    console.log(value);
+  });
 };
 
 segmentBuddy.getSegmentSize = function () {
@@ -76,18 +119,36 @@ segmentBuddy.saveSegment = function() {
   browser.findElement(webdriver.By.id("save-segment-button")).click();
 };
 
+segmentBuddy.addSegment = function() {
+  var browser = segmentBuddy.browser;
+  var webdriver = segmentBuddy.webdriver;
+  var promise = new Promise(function(resolve, reject) {
+    browser.findElement(webdriver.By.id("add-segment")).then(function(element) {
+      element.click();
+      resolve(true);
+    });
+  });
+  return promise;
+};
+
 segmentBuddy.newTestSegment = function(advertiserName, segmentName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  browser.findElement(webdriver.By.id("add-segment")).click();
-  browser.wait(function() {
-    return browser.findElement(webdriver.By.id("advertisers")).isDisplayed();
-  }, 1500).then(function() {
-    segmentBuddy.setAdvertiser(advertiserName);
-    setTimeout(function() {
-      segmentBuddy.setSegmentName(segmentName);
-    }, 2000);
+  var promise = new Promise(function(resolve, reject) {
+    segmentBuddy.addSegment().then(function() {
+      console.log("setSegmentName");
+      return segmentBuddy.setSegmentName(segmentName);
+    }).
+    then(function() {
+      return segmentBuddy.setAdvertiser(advertiserName);
+    }).
+    then(function() {
+      resolve(true);
+    }, function(err) {
+      reject(new Error("Something Went Wrong Oh No nononono"));
+    });
   });
+  return promise;
 };
 
 module.exports = segmentBuddy;
