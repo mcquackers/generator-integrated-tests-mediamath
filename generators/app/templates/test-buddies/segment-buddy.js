@@ -82,13 +82,23 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
 segmentBuddy.getSegmentSize = function () {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var refreshButton = browser.findElement(webdriver.By.id("refresh-button"));
-  refreshButton.click();
-  return setTimeout(function() {
-    browser.findElement(webdriver.By.className("segment-size")).getText().then(function(text) {
-      return text;
-    });
-  }, 3000);
+  var promise = new Promise(function(resolve, reject) {
+    browser.findElement(webdriver.By.id("refresh-button")).
+      then(function(refreshButton) {
+        return refreshButton.click();
+      }).then(function() {
+        setTimeout(function() {
+          browser.findElement(webdriver.By.className("segment-size")).getText().then(function(text) {
+            if(text != "--"){
+              resolve(text);
+            } else {
+              reject(new Error("Non-numerical Value.  Maybe give more time?"));
+            }
+          });
+        }, 4500);
+      });
+  });
+  return promise;
 };
 
 segmentBuddy.exitSegment = function() {
@@ -112,7 +122,14 @@ segmentBuddy.exitSegment = function() {
 segmentBuddy.saveSegment = function() {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  browser.findElement(webdriver.By.id("save-segment-button")).click();
+  var promise = new Promise(function(resolve, reject) {
+    browser.findElement(webdriver.By.id("save-segment-button")).click().then(function() {
+      resolve(true);
+    }, function(err) {
+      reject(err);
+    });
+  });
+  return promise;
 };
 
 segmentBuddy.addSegment = function() {
