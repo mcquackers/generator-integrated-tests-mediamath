@@ -26,17 +26,13 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
   var elementHold;
-  console.log("In setAdvertiser");
   browser.findElement(webdriver.By.xpath("//*[@id='advertisers']")).
     then(function(element) {
-      console.log("Found element");
       var promise = new Promise(function(resolve, reject) {
         setTimeout(function() {
-          console.log("About to click!");
           element.click().then(function() {
             resolve(true);
           }, function(err) {
-            console.log("Oh no!");
             reject(err);
           });
         }, 1500);
@@ -66,8 +62,6 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
           var asyncCatcher = 0;
           for(var i = 0; i < elements.length; i++) {
             elements[i].getText().then(function(text) {
-              console.log(asyncCatcher);
-              console.log(text);
               if(text == advertiserName) {
                 elements[asyncCatcher].click();
                 resolve(true);
@@ -82,8 +76,6 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
       }, 1000);
     });
     return promise;
-  }).then(function(value) {
-    console.log(value);
   });
 };
 
@@ -102,15 +94,19 @@ segmentBuddy.getSegmentSize = function () {
 segmentBuddy.exitSegment = function() {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  setTimeout(function() {
-    browser.wait(function() {
-      var saveButton = browser.findElement(webdriver.By.xpath("//*[@id='save-segment-button']"));
-      return saveButton.isEnabled();
-    }, 20000).then(function() {
-      browser.findElement(webdriver.By.xpath("//*[@id='cancel-segment-button']")).click();
-      browser.findElement(webdriver.By.xpath("//*[@id='unsaved-changes-continue-button']")).click();
-    });
-  }, 5000);
+  var promise = new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      browser.wait(function() {
+        var saveButton = browser.findElement(webdriver.By.xpath("//*[@id='save-segment-button']"));
+        return saveButton.isEnabled();
+      }, 20000).then(function() {
+        browser.findElement(webdriver.By.xpath("//*[@id='cancel-segment-button']")).click();
+        browser.findElement(webdriver.By.xpath("//*[@id='unsaved-changes-continue-button']")).click();
+        resolve(true);
+      });
+    }, 5000);
+  });
+  return promise;
 };
 
 segmentBuddy.saveSegment = function() {
@@ -136,7 +132,6 @@ segmentBuddy.newTestSegment = function(advertiserName, segmentName) {
   var webdriver = segmentBuddy.webdriver;
   var promise = new Promise(function(resolve, reject) {
     segmentBuddy.addSegment().then(function() {
-      console.log("setSegmentName");
       return segmentBuddy.setSegmentName(segmentName);
     }).
     then(function() {
