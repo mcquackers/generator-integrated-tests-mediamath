@@ -7,7 +7,7 @@ a custom built framework and yeoman generator.
 ##### Installation
 1. Git clone the repo into the desired directory.
 2. Run `npm link`
-3. Create folder to hold testing framework and tests
+3. Create a new folder adjacent to the repo folder to hold testing framework and tests
 4. In this newly created folder, run `npm install yo`
 5. run `yo integrated-tests-mediamath`
 6. Enter desired default Username and password
