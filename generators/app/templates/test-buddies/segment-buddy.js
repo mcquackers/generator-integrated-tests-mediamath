@@ -1,4 +1,3 @@
-var Q = require("q");
 segmentBuddy = {};
 
 segmentBuddy.initialize = function(browser, webdriver) {
@@ -9,54 +8,59 @@ segmentBuddy.initialize = function(browser, webdriver) {
 segmentBuddy.setSegmentName = function(segmentName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var promise = new Promise(function(resolve, reject) {
+  var setSegmentNamePromise = new Promise(function(resolveSetSegmentName, rejectSetSegmentName) {
     var segmentNameInput;
     segmentNameInput = browser.findElement(webdriver.By.id("segment-name-wc"));
     segmentNameInput.click().
       then(function() {
         return segmentNameInput.sendKeys(segmentName);
       }).then(function() {
-        resolve(true);
+        resolveSetSegmentName(true);
+      }, function(err) {
+        rejectSetSegmentName(err);
       });
   });
-  return promise;
+  return setSegmentNamePromise;
 };
 
 segmentBuddy.setAdvertiser = function(advertiserName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
   var elementHold;
-  browser.findElement(webdriver.By.xpath("//*[@id='advertisers']")).
+  var setAdvertiserPromise = new Promise(function(resolveSetAdvertiser, rejectSetAdvertiser) {
+    browser.findElement(webdriver.By.xpath("//*[@id='advertisers']")).
+      then(function(element) {
+        var openDropdownPromise = new Promise(function(resolveOpenDropdown, rejectOpenDropdown) {
+          setTimeout(function() {
+            element.click().then(function() {
+              resolveOpenDropdown(true);
+            }, function(err) {
+              rejectOpenDropdown(err);
+            });
+          }, 1500);
+        });
+        return openDropdownPromise;
+      }).then(function() {
+        return browser.findElement(webdriver.By.xpath("//*[@id='advertisers']/mm-input"));
+      }).
     then(function(element) {
-      var promise = new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          element.click().then(function() {
-            resolve(true);
-          }, function(err) {
-            reject(err);
-          });
-        }, 1500);
-      });
-      return promise;
-    }).then(function() {
-      return browser.findElement(webdriver.By.xpath("//*[@id='advertisers']/mm-input"));
+      elementHold = element;
+      return element.click();
     }).
-  then(function(element) {
-    elementHold = element;
-    return element.click();
-  }).
-  then(function() {
-    var promise = new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        elementHold.sendKeys(advertiserName);
-        resolve(true);
-      }, 1000);
-    });
-    return promise;
-  }, function(err) {
-    console.log(err);
-  }).then(function() {
-    var promise = new Promise(function(resolve, reject) {
+    then(function() {
+      var sendSearchKeyPromise = new Promise(function(resolveSendSearchKey, rejectSendSearchKey) {
+        setTimeout(function() {
+          elementHold.sendKeys(advertiserName).then(function() {
+            resolveSendSearchKey(true);
+          }, function(err) {
+            rejectSendSearchKey(err);
+          });
+        }, 1000);
+      });
+      return sendSearchKeyPromise;
+    }, function(err) {
+      console.log(err);
+    }).then(function() {
       setTimeout(function() {
         browser.findElements(webdriver.By.xpath("//*[@id='advertisers']/mm-list-item")).then(function(elements) {
           var asyncCatcher = 0;
@@ -64,9 +68,9 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
             elements[i].getText().then(function(text) {
               if(text == advertiserName) {
                 elements[asyncCatcher].click();
-                resolve(true);
+                resolveSetAdvertiser(true);
               } else if(asyncCatcher == elements.length) {
-                reject(new Error("The advertiser Search key could not be found in the list"));
+                rejectSetAdvertiser(new Error("The advertiser Search key could not be found in the list"));
               } else {
                 asyncCatcher++;
               }
@@ -75,14 +79,14 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
         });
       }, 1000);
     });
-    return promise;
   });
+  return setAdvertiserPromise;
 };
 
 segmentBuddy.getSegmentSize = function () {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var promise = new Promise(function(resolve, reject) {
+  var segmentSizePromise = new Promise(function(resolveSegmentSize, rejectSegmentSize) {
     browser.findElement(webdriver.By.id("refresh-button")).
       then(function(refreshButton) {
         return refreshButton.click();
@@ -90,9 +94,9 @@ segmentBuddy.getSegmentSize = function () {
         setTimeout(function() {
           browser.findElement(webdriver.By.className("segment-size")).getText().then(function(text) {
             if(text != "--"){
-              resolve(text);
+              resolveSegmentSize(text);
             } else {
-              reject(new Error("Non-numerical Value.  Maybe give more time?"));
+              rejectSegmentSize(new Error("Non-numerical Value.  Maybe give more time?"));
             }
           });
         }, 4500);
@@ -104,50 +108,56 @@ segmentBuddy.getSegmentSize = function () {
 segmentBuddy.exitSegment = function() {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var promise = new Promise(function(resolve, reject) {
+  var exitSegmentPromise = new Promise(function(resolveExitSegment, rejectExitSegment) {
     setTimeout(function() {
       browser.wait(function() {
         var saveButton = browser.findElement(webdriver.By.xpath("//*[@id='save-segment-button']"));
         return saveButton.isEnabled();
       }, 20000).then(function() {
         browser.findElement(webdriver.By.xpath("//*[@id='cancel-segment-button']")).click();
-        browser.findElement(webdriver.By.xpath("//*[@id='unsaved-changes-continue-button']")).click();
-        resolve(true);
+        browser.findElement(webdriver.By.xpath("//*[@id='unsaved-changes-continue-button']")).click().then(function() {
+          resolveExitSegment(true);
+        }, function(err) {
+          rejectExitSegment(err);
+        });
       });
     }, 5000);
   });
-  return promise;
+  return exitSegmentPromise;
 };
 
 segmentBuddy.saveSegment = function() {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var promise = new Promise(function(resolve, reject) {
+  var saveSegmentPromise = new Promise(function(resolveSaveSegment, rejectSaveSegment) {
     browser.findElement(webdriver.By.id("save-segment-button")).click().then(function() {
-      resolve(true);
+      resolveSaveSegment(true);
     }, function(err) {
-      reject(err);
+      rejectSaveSegment(err);
     });
   });
-  return promise;
+  return saveSegmentPromise;
 };
 
 segmentBuddy.addSegment = function() {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var promise = new Promise(function(resolve, reject) {
-    browser.findElement(webdriver.By.id("add-segment")).then(function(element) {
-      element.click();
-      resolve(true);
-    });
+  var addSegmentPromise = new Promise(function(resolveAddSegment, rejectAddSegment) {
+    setTimeout(function() {
+      browser.findElement(webdriver.By.id("add-segment")).click().then(function() {
+        resolveAddSegment(true);
+      }, function(err) {
+        rejectAddSegment(err);
+      });
+    }, 1000);
   });
-  return promise;
+  return addSegmentPromise;
 };
 
 segmentBuddy.newTestSegment = function(advertiserName, segmentName) {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
-  var promise = new Promise(function(resolve, reject) {
+  var newSegmentPromise = new Promise(function(resolveNewSegment, rejectNewSegment) {
     segmentBuddy.addSegment().then(function() {
       return segmentBuddy.setSegmentName(segmentName);
     }).
@@ -155,12 +165,12 @@ segmentBuddy.newTestSegment = function(advertiserName, segmentName) {
       return segmentBuddy.setAdvertiser(advertiserName);
     }).
     then(function() {
-      resolve(true);
+      resolveNewSegment(true);
     }, function(err) {
-      reject(new Error("Something Went Wrong Oh No nononono"));
+      rejectNewSegment(err);
     });
   });
-  return promise;
+  return newSegmentPromise;
 };
 
 module.exports = segmentBuddy;
