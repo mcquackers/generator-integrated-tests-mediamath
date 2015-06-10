@@ -1,6 +1,6 @@
 ### DMP Automatic Integrated Javascript Tests
 
-Documentation v0.6 - Brian McQueen - MediaMath Cambridge
+v1.0.0 - Brian McQueen - MediaMath Cambridge
 
 * ###### Dev Notes
 * ###### Installation
