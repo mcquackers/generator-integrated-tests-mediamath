@@ -102,7 +102,7 @@ segmentBuddy.getSegmentSize = function () {
         }, 4500);
       });
   });
-  return promise;
+  return segmentSizePromise;
 };
 
 segmentBuddy.exitSegment = function() {
