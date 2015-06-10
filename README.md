@@ -47,6 +47,13 @@ firstAction().then(function() {
 });
 ```
 
+#### Usage of `done` callback:
+For each test case, the `done` callback must be passed in to mocha and then
+called at the end of the test.
+```javascript
+test.it("test-description", function(done) {
+```
+
 
 #### Installation
 ##### via Yeoman
