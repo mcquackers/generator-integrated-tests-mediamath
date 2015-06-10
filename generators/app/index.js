@@ -18,7 +18,14 @@ module.exports = generators.Base.extend({
         message   : "Enter default T1 password: "
       }, function(answers) {
         this.password = answers.password;
-        done();
+        this.prompt({
+          type    : "input",
+          name    : "serverAddress",
+          message : "Enter server address: "
+        }, function(answers) {
+          this.serverAddress = answers.serverAddress;
+          done();
+        }.bind(this));
       }.bind(this));
     }.bind(this));
   },
@@ -28,7 +35,8 @@ module.exports = generators.Base.extend({
         this.destinationPath("./test-buddies/"),
         {
           username: this.username,
-          password: this.password
+          password: this.password,
+          serverAddress: this.serverAddress
         }
     );
     this.fs.copy(
