@@ -4,7 +4,7 @@ var webdriver = require("selenium-webdriver");
 var test = require("selenium-webdriver/testing");
 var advertiserSearchKey = "<%= advertiser %>";
 var segmentName = "<%= segmentName %>";
-var WAIT_TIME = 25000;
+var WAIT_TIME = 15000;
 var browser;
 var loginBuddy;
 var behaviorBuddy;

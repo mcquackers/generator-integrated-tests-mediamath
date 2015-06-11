@@ -24,25 +24,18 @@ behaviorBuddy.selectItem = function(stringToSelect) {
   var browser = behaviorBuddy.browser;
   var webdriver = behaviorBuddy.webdriver;
   var selectItemPromise = new Promise(function(resolveSelectItem, rejectSelectItem) {
-    setTimeout(function() {
-      browser.findElements(webdriver.By.className("name")).then(function(elements) {
-        var asyncCatcher = 0;
-        for(var i = 0; i < elements.length; i++) {
-          elements[i].getText().then(function(text) {
-            if(text == stringToSelect) {
-              elements[asyncCatcher].click().then(function() {
-                resolveSelectItem(true);
-              }, function(err) {
-                rejectSelectItem(err);
-              });
-            } else if(asyncCatcher == elements.length) {
-              rejectSelectItem(new Error("Item not found"));
-            }
-            asyncCatcher++;
-          });
-        }
+      browser.wait(function() {
+        return browser.findElement(webdriver.By.xpath("//span[text()=\"" + stringToSelect + "\"]"));
+            }, 1500).
+      then(function(element) {
+        element.click().then(function() {
+          resolveSelectItem(true);
+        }, function(err) {
+          rejectSelectItem(err);
+        });
+      }, function(err) {
+        rejectSelectItem(err);
       });
-    }, 1500);
   });
   return selectItemPromise;
 };
@@ -179,7 +172,6 @@ behaviorBuddy.addEventPixel = function(pixelToAdd, advertiserName) {
   var browser = behaviorBuddy.browser;
   var webdriver = behaviorBuddy.webdriver;
   var addEventPixelPromise = new Promise(function(resolveAddEventPixel, rejectAddEventPixel) {
-    console.log("In addEventPixel");
     behaviorBuddy.addBehavior().then(function() {
       return behaviorBuddy.selectItem(advertiserName);
     }).
@@ -187,7 +179,6 @@ behaviorBuddy.addEventPixel = function(pixelToAdd, advertiserName) {
       return behaviorBuddy.selectItem(behaviorBuddy.EVENT_PIXELS);
     }).
     then(function() {
-      console.log("Look for pixel");
       return behaviorBuddy.selectItem(pixelToAdd);
     }).
     then(function() {
