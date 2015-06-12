@@ -66,7 +66,7 @@ module.exports = generators.Base.extend({
           username: this.username,
           password: this.password,
           ticketName: this.ticketName,
-          serverAddress: this.serverAddress;
+          serverAddress: this.serverAddress,
           advertiser: this.advertiser,
           segmentName: this.segmentName
         }
