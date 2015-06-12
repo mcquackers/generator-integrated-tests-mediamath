@@ -25,25 +25,32 @@ module.exports = generators.Base.extend({
           this.ticketName = answers.ticketName;
           this.prompt({
             type      : "input",
-            name      : "advertiser",
-            message   : "Advertiser to use for test: ",
-            store     : true
+            name      : "serverAddress",
+            message   : "Enter server address (useful for PRs), leave blank for default"
           }, function(answers) {
-            this.advertiser = answers.advertiser;
+            this.serverAddress = answers.serverAddress;
             this.prompt({
-              type    : "input",
-              name    : "segmentName",
-              message : "Name for segment: "
+              type      : "input",
+              name      : "advertiser",
+              message   : "Advertiser to use for test: ",
+              store     : true
             }, function(answers) {
-              this.segmentName = answers.segmentName;
+              this.advertiser = answers.advertiser;
               this.prompt({
-                type  : "input",
-                name  : "mochaTimeout",
-                message : "Enter Mocha timeout: ",
-                store   : true
+                type    : "input",
+                name    : "segmentName",
+                message : "Name for segment: "
               }, function(answers) {
-                this.mochaTimeout = answers.mochaTimeout;
-                done();
+                this.segmentName = answers.segmentName;
+                this.prompt({
+                  type  : "input",
+                  name  : "mochaTimeout",
+                  message : "Enter Mocha timeout: ",
+                  store   : true
+                }, function(answers) {
+                  this.mochaTimeout = answers.mochaTimeout;
+                  done();
+                }.bind(this));
               }.bind(this));
             }.bind(this));
           }.bind(this));
@@ -59,6 +66,7 @@ module.exports = generators.Base.extend({
           username: this.username,
           password: this.password,
           ticketName: this.ticketName,
+          serverAddress: this.serverAddress;
           advertiser: this.advertiser,
           segmentName: this.segmentName
         }
