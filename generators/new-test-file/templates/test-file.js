@@ -21,7 +21,7 @@ test.describe("<%= ticketName %>", function() {
     segmentBuddy = require("../test-buddies/segment-buddy.js");
     behaviorBuddy.initialize(browser, webdriver);
     segmentBuddy.initialize(browser,webdriver);
-    loginBuddy.login(webdriver, browser, "<%= username %>", "<%= password %>", "serverAddress");
+    loginBuddy.login(webdriver, browser, "<%= username %>", "<%= password %>", "<%= serverAddress %>");
     browser.findElement(webdriver.By.className("nav-icon-segments")).click();
     done();
   })
