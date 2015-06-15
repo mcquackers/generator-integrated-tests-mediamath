@@ -26,6 +26,10 @@ test.describe("<%= ticketName %>", function() {
     done();
   })
 
+  after("Close Browser", function() {
+    browser.quit();
+  })
+
   // test.it("begin test steps here", function() {
   // })
 });
