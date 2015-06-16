@@ -36,17 +36,23 @@ module.exports = generators.Base.extend({
         {
           username: this.username,
           password: this.password,
+        }
+        );
+    this.fs.copyTpl(
+        this.templatePath("./test/"),
+        this.destinationPath("./test/"),
+        {
           serverAddress: this.serverAddress
         }
-    );
+        );
     this.fs.copy(
-      this.templatePath("./chromedriver"),
-      this.destinationPath("./chromedriver")
-    );
+        this.templatePath("./chromedriver"),
+        this.destinationPath("./chromedriver")
+        );
     this.fs.copy(
-      this.templatePath("./package.json"),
-      this.destinationPath("./package.json")
-    );
+        this.templatePath("./package.json"),
+        this.destinationPath("./package.json")
+        );
   },
   install: function() {
     this.npmInstall();

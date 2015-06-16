@@ -6,7 +6,8 @@ loginBuddy.login = function(webdriver, browser, username, password, serverAddres
     var password = "<%= password %>";
   }
   if(serverAddress == "") {
-    browser.get("<%= serverAddress %>");
+    var config = require("../test/config.js");
+    browser.get(config.serverAddress);
   } else {
     browser.get(serverAddress);
   }

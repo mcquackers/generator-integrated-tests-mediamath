@@ -1,0 +1,3 @@
+module.exports = {
+  serverAddress: "<%= serverAddress %>"
+};
