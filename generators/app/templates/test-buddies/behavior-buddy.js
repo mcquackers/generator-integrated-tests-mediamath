@@ -37,7 +37,7 @@ behaviorBuddy.selectItem = function(stringToSelect) {
       }, function(err) {
         rejectSelectItem(err);
       });
-    }, 750);
+    }, 1000);
   });
   return selectItemPromise;
 };
