@@ -24,6 +24,7 @@ behaviorBuddy.selectItem = function(stringToSelect) {
   var browser = behaviorBuddy.browser;
   var webdriver = behaviorBuddy.webdriver;
   var selectItemPromise = new Promise(function(resolveSelectItem, rejectSelectItem) {
+    setTimeout(function() {
       browser.wait(function() {
         return browser.findElement(webdriver.By.xpath("//span[text()=\"" + stringToSelect + "\"]"));
             }, 1500).
@@ -36,6 +37,7 @@ behaviorBuddy.selectItem = function(stringToSelect) {
       }, function(err) {
         rejectSelectItem(err);
       });
+    }, 750);
   });
   return selectItemPromise;
 };
