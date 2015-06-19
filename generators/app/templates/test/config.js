@@ -1,3 +1,7 @@
+var baseAddress = "<%= baseAddress %>";
 module.exports = {
-  serverAddress: "<%= serverAddress %>"
+  baseAddress: baseAddress,
+  serverAddress: baseAddress+"/git/latest/",
+  login: "<%= username %>",
+  password: "<%= password %>"
 };

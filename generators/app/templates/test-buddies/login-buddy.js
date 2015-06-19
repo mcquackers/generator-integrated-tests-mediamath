@@ -1,12 +1,12 @@
 loginBuddy = {};
 
 loginBuddy.login = function(webdriver, browser, username, password, serverAddress) {
+    var config = require("../test/config.js");
   if(username === "" || password === "") {
-    var username = "<%= username %>";
-    var password = "<%= password %>";
+    var username = config.login;
+    var password = config.password;
   }
   if(serverAddress == "") {
-    var config = require("../test/config.js");
     browser.get(config.serverAddress);
   } else {
     browser.get(serverAddress);

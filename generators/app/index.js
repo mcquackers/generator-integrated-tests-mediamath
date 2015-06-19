@@ -20,10 +20,10 @@ module.exports = generators.Base.extend({
         this.password = answers.password;
         this.prompt({
           type    : "input",
-          name    : "serverAddress",
-          message : "Enter server address: "
+          name    : "baseAddress",
+          message : "Enter base server address or base URL: "
         }, function(answers) {
-          this.serverAddress = answers.serverAddress;
+          this.baseAddress = answers.baseAddress;
           done();
         }.bind(this));
       }.bind(this));
@@ -32,17 +32,15 @@ module.exports = generators.Base.extend({
   writing: function() {
     this.fs.copyTpl(
         this.templatePath("./test-buddies/"),
-        this.destinationPath("./test-buddies/"),
-        {
-          username: this.username,
-          password: this.password,
-        }
+        this.destinationPath("./test-buddies/")
         );
     this.fs.copyTpl(
         this.templatePath("./test/"),
         this.destinationPath("./test/"),
         {
-          serverAddress: this.serverAddress
+          baseAddress: this.baseAddress,
+          username: this.username,
+          password: this.password
         }
         );
     this.fs.copy(
