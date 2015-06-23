@@ -7,6 +7,7 @@ var segmentName = "<%= segmentName %>";
 var WAIT_TIME = 15000;
 var browser;
 var loginBuddy;
+var browserBudder;
 var behaviorBuddy;
 var segmentBuddy;
 // SET THESE VARIABLES BEFORE TESTING
@@ -14,8 +15,8 @@ var pixelsToSelect = [];
 
 test.describe("<%= ticketName %>", function() {
   test.before("Open browser and login", function(done) {
-    browser = require("../test-buddies/browser-buddy.js").
-      createBrowser(webdriver, WAIT_TIME);
+    browserBuddy = require("../test-buddies/browser-buddy.js");
+    browser = browserBuddy.createBrowser(webdriver, WAIT_TIME);
     loginBuddy = require("../test-buddies/login-buddy.js");
     behaviorBuddy = require("../test-buddies/behavior-buddy.js");
     segmentBuddy = require("../test-buddies/segment-buddy.js");
@@ -23,7 +24,9 @@ test.describe("<%= ticketName %>", function() {
     segmentBuddy.initialize(browser,webdriver);
     loginBuddy.login(webdriver, browser, "<%= username %>", "<%= password %>", "<%= serverAddress %>");
     browser.findElement(webdriver.By.className("nav-icon-segments")).click();
+    browser.setOrg("aperture").then(function() {
     done();
+    });
   })
 
   after("Close Browser", function() {
