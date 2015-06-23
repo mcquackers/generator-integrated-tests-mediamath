@@ -23,9 +23,11 @@ test.describe("<%= ticketName %>", function() {
     behaviorBuddy.initialize(browser, webdriver);
     segmentBuddy.initialize(browser,webdriver);
     loginBuddy.login(webdriver, browser, "<%= username %>", "<%= password %>", "<%= serverAddress %>");
-    browser.findElement(webdriver.By.className("nav-icon-segments")).click();
     browser.setOrg("aperture").then(function() {
-    done();
+      return browser.findElement(webdriver.By.className("nav-icon-segments")).click();
+    }).
+    then(function() {
+      done();
     });
   })
 

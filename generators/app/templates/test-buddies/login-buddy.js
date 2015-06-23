@@ -3,7 +3,7 @@ loginBuddy = {};
 loginBuddy.login = function(webdriver, browser, username, password, serverAddress) {
     var config = require("../test/config.js");
   if(username === "" || password === "") {
-    var username = config.login;
+    var username = config.username;
     var password = config.password;
   }
   if(serverAddress == "") {
