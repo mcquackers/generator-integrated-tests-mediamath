@@ -32,9 +32,11 @@ behaviorBuddy.selectItem = function(stringToSelect) {
         element.click().then(function() {
           resolveSelectItem(true);
         }, function(err) {
+          //something went wrong with the click
           rejectSelectItem(err);
         });
       }, function(err) {
+        //should be when the wait times out
         rejectSelectItem(err);
       });
     }, 1000);

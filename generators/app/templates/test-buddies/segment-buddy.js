@@ -62,22 +62,13 @@ segmentBuddy.setAdvertiser = function(advertiserName) {
       console.log(err);
     }).then(function() {
       setTimeout(function() {
-        browser.findElements(webdriver.By.xpath("//*[@id='advertisers']/mm-list-item")).then(function(elements) {
-          var asyncCatcher = 0;
-          for(var i = 0; i < elements.length; i++) {
-            elements[i].getText().then(function(text) {
-              if(text == advertiserName) {
-                elements[asyncCatcher].click();
-                resolveSetAdvertiser(true);
-              } else if(asyncCatcher == elements.length) {
-                rejectSetAdvertiser(new Error("The advertiser Search key could not be found in the list"));
-              } else {
-                asyncCatcher++;
-              }
+        browser.findElement(webdriver.By.xpath("//mm-list-item[text()=\"" + advertiserName + "\"]")).
+          then(function(element) {
+            element.click().then(function() {
+              resolveSetAdvertiser(true);
             });
-          }
-        });
-      }, 1000);
+          });
+      }, 1750);
     });
   });
   return setAdvertiserPromise;
@@ -87,20 +78,22 @@ segmentBuddy.getSegmentSize = function () {
   var browser = segmentBuddy.browser;
   var webdriver = segmentBuddy.webdriver;
   var segmentSizePromise = new Promise(function(resolveSegmentSize, rejectSegmentSize) {
-    browser.findElement(webdriver.By.id("refresh-button")).
-      then(function(refreshButton) {
-        return refreshButton.click();
-      }).then(function() {
-        setTimeout(function() {
-          browser.findElement(webdriver.By.className("segment-size")).getText().then(function(text) {
-            if(text != "--"){
-              resolveSegmentSize(text);
-            } else {
-              rejectSegmentSize(new Error("Non-numerical Value.  Maybe give more time?"));
-            }
-          });
-        }, 4500);
-      });
+    setTimeout(function() {
+      browser.findElement(webdriver.By.id("refresh-button")).
+        then(function(refreshButton) {
+          return refreshButton.click();
+        }).then(function() {
+          setTimeout(function() {
+            browser.findElement(webdriver.By.className("segment-size")).getText().then(function(text) {
+              if(text != "--"){
+                resolveSegmentSize(text);
+              } else {
+                rejectSegmentSize(new Error("Non-numerical Value.  Maybe give more time?"));
+              }
+            });
+          }, 6500);
+        });
+    }, 1000);
   });
   return segmentSizePromise;
 };
@@ -114,12 +107,15 @@ segmentBuddy.exitSegment = function() {
         var saveButton = browser.findElement(webdriver.By.xpath("//*[@id='save-segment-button']"));
         return saveButton.isEnabled();
       }, 20000).then(function() {
-        browser.findElement(webdriver.By.xpath("//*[@id='cancel-segment-button']")).click();
-        browser.findElement(webdriver.By.xpath("//*[@id='unsaved-changes-continue-button']")).click().then(function() {
-          resolveExitSegment(true);
-        }, function(err) {
-          rejectExitSegment(err);
-        });
+        return browser.findElement(webdriver.By.xpath("//*[@id='cancel-segment-button']")).click();
+      }).
+      then(function() {
+        return browser.findElement(webdriver.By.xpath("//*[@id='unsaved-changes-continue-button']")).click();
+      })
+      .then(function() {
+        resolveExitSegment(true);
+      }, function(err) {
+        rejectExitSegment(err);
       });
     }, 5000);
   });
@@ -131,7 +127,13 @@ segmentBuddy.saveSegment = function() {
   var webdriver = segmentBuddy.webdriver;
   var saveSegmentPromise = new Promise(function(resolveSaveSegment, rejectSaveSegment) {
     browser.findElement(webdriver.By.id("save-segment-button")).click().then(function() {
-      resolveSaveSegment(true);
+      setTimeout(function() {
+        browser.wait(function() {
+          return browser.findElement(webdriver.By.id("save-segment-button")).isEnabled();
+        }, 15000).then(function() {
+          resolveSaveSegment(true);
+        });
+      }, 1000);
     }, function(err) {
       rejectSaveSegment(err);
     });
@@ -172,5 +174,50 @@ segmentBuddy.newTestSegment = function(advertiserName, segmentName) {
   });
   return newSegmentPromise;
 };
+
+segmentBuddy.editSegment = function(segmentName) {
+  var segmentID;
+  var browser = segmentBuddy.browser;
+  var webdriver = segmentBuddy.webdriver;
+  var editSegmentPromise = new Promise(function(resolveEditSegment, rejectEditSegment) {
+    setTimeout(function() {
+      browser.wait(function () {
+        return browser.isElementPresent({tagName:"mm-grid-item"});
+      }, 4000).then(function() {
+        return browser.executeScript("return $('mm-grid-item::shadow #columnContainer').find('div:contains(\""+segmentName+"\")').siblings('div').first().text().trim()");
+      }).
+      then(function(text){
+        segmentID = text;
+        var editButtonClassName = "segment-settings-"+segmentID;
+        return browser.findElement({className:editButtonClassName});
+      }).
+      then(function(element){
+        var waitPromise = new Promise(function(resolveWait, rejectWait) {
+          setTimeout(function() {
+            element.click().then(function() {
+              resolveWait(true);
+            });
+          }, 1500);
+        });
+        return waitPromise;
+      }).
+      then(function(){
+        return browser.findElement({className:'menuLabel'});
+      }).
+      then(function(element){
+        return element.click();
+      }).then(function() {
+        setTimeout(function() {
+          resolveEditSegment(true);
+        }, 2000);
+      }, function(err) {
+        console.log(err);
+        rejectEditSegment(err);
+      });
+    }, 2500);
+  });
+  return editSegmentPromise;
+};
+
 
 module.exports = segmentBuddy;

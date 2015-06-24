@@ -14,7 +14,7 @@ browserBuddy.createBrowser = function(webdriver, implicitWaitTime) {
   return browser;
 };
 
-browserBuddy.changeOrganization = function(orgName) {
+browserBuddy.setOrg = function(orgName) {
   var webdriver = browserBuddy.webdriver;
   var browser = browserBuddy.browser;
   var setOrgPromise = new Promise(function(resolveSetOrg, rejectSetOrg) {
@@ -26,6 +26,7 @@ browserBuddy.changeOrganization = function(orgName) {
             return browser.findElement(webdriver.By.xpath("//*[@id='lo-6']/div/div/div[2]/div[1]/input"));
           }).
         then(function(element) {
+          console.log(element);
           return element.sendKeys(orgName);
         }).
         then(function() {
@@ -42,5 +43,5 @@ browserBuddy.changeOrganization = function(orgName) {
     });
   });
   return setOrgPromise;
-});
+};
 module.exports = browserBuddy;
